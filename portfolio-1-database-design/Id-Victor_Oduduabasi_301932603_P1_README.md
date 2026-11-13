@@ -34,33 +34,28 @@ Register a patient; schedule a consultation; admit and discharge a patient to a 
 
 One hospital facility using fictional records across patient registration, outpatient consultations, inpatient bed admissions, pharmacy dispensing, and billing. Separate ward tables, insurance claims, lab tests, surgical scheduling, and user authentication are outside this scope.
 
-# MIT 8103 Portfolio 1 Consistency Audit
+## Design and implementation files
 
-## 1. Summary Verdict
-Your 9 tables, columns, data types, primary keys, foreign keys, unique constraints, and sample data are **100% consistent** across all 7 files. However, there are **two minor rule-numbering/comment mismatches** between `README` and `Schema`/`Design` that you should clean up so an examiner does not spot a numbering shift.
+| File | Contents |
+| :--- | :--- |
+| [Id-Victor_Oduduabasi_301932603_P1_Design.md](Id-Victor_Oduduabasi_301932603_P1_Design.md) | Entity definitions, PostgreSQL data types, keys, relationships, rule mapping, and design assumptions |
+| [Id-Victor_Oduduabasi_301932603_P1_ERDiagram.md](Id-Victor_Oduduabasi_301932603_P1_ERDiagram.md) | Mermaid entity-relationship diagram, key notation, cardinalities, and optional field notes |
+| [Id-Victor_Oduduabasi_301932603_P1_Normalisation.md](Id-Victor_Oduduabasi_301932603_P1_Normalisation.md) | Step-by-step normalisation from 0NF to 3NF using fictional hospital records |
+| [Id-Victor_Oduduabasi_301932603_P1_Schema.sql](Id-Victor_Oduduabasi_301932603_P1_Schema.sql) | PostgreSQL 16 DDL script creating all 9 tables, keys, partial unique indexes, and CHECK constraints |
+| [Id-Victor_Oduduabasi_301932603_P1_SampleData.sql](Id-Victor_Oduduabasi_301932603_P1_SampleData.sql) | Transactional script inserting valid fictional records across all 9 tables |
+| [Id-Victor_Oduduabasi_301932603_P1_ConstraintTests.sql](Id-Victor_Oduduabasi_301932603_P1_ConstraintTests.sql) | Deliberately invalid `INSERT` statements testing constraints followed by a 9-table row-count query |
+| [screenshots/](screenshots/) | Terminal captures of database connection, table creation, data insertion, constraint errors, and final row counts (`Id-Victor_Oduduabasi_301932603_P1_DatabaseConnection.png`, `Id-Victor_Oduduabasi_301932603_P1_TableCreation.png`, `Id-Victor_Oduduabasi_301932603_P1_TableList.png`, `Id-Victor_Oduduabasi_301932603_P1_Constraints1.png`–`3.png`, `Id-Victor_Oduduabasi_301932603_P1_InsertData1.png`–`2.png`, `Id-Victor_Oduduabasi_301932603_P1_ConstraintTests1.png`–`2.png`, and `Id-Victor_Oduduabasi_301932603_P1_RecordCounts.png`) |
 
----
+## Implementation
 
-## 2. Audit Findings & Quick Fixes
+The database `hospital_management_portfolio` runs on PostgreSQL inside the `workspaces/Id-Victor_Oduduabasi_301932603` Codespace. The schema script creates nine tables in the `public` schema (`patient`, `doctor`, `bed`, `medication`, `admission`, `consultation`, `prescription`, `prescription_item`, and `invoice`) using `SERIAL` primary keys, foreign key references, `NOT NULL` requirements, `UNIQUE` constraints on natural identifiers and time slots, `CHECK` constraints for valid numeric ranges, date order, and invoice settlement, and partial unique indexes (`WHERE discharge_date IS NULL`) on `admission(bed_id)` and `admission(patient_id)` to prevent overlapping active ward stays.
 
-| Category | Status | Details & Action Needed |
-| :--- | :--- | :--- |
-| **File & Database Naming** | **Pass** | All 7 filenames follow `Id-Victor_Oduduabasi_301932603_P1_<Artifact>` cleanly, and the database name `hospital_management_portfolio` matches everywhere. |
-| **Rule Numbering (8 vs. 9 rules)** | **Fix Needed** | In `README`, you have **8 numbered rules** (1 to 8). Earlier in `Design` and `ERDiagram`, Rule 2 was a blank line, which shifted Rules 3–9 down by one number in `Schema` comments (e.g., `Schema` comments say `(Rules 3 & 4)` for `admission`, `(Rule 5)` for `consultation`, `(Rules 6 & 7)` for `prescription`, and `(Rules 8 & 9)` for `invoice`).<br>**Fix:** Update the rule numbers inside the SQL comments of `Schema.sql` (and `Design.md` if you haven't removed the blank Rule 2) so they match the **1–8** numbering in `README.md` (`Admission` = Rules 2 & 3, `Consultation` = Rule 4, `Prescription` = Rules 5 & 6, `Invoice` = Rules 7 & 8). |
-| **Table & Column Names** | **Pass** | Every table (`patient`, `doctor`, `bed`, `medication`, `admission`, `consultation`, `prescription`, `prescription_item`, `invoice`) and every column name matches identically across `Design`, `ERDiagram`, `Normalisation`, `Schema`, `SampleData`, and `ConstraintTests`. |
-| **Data Types & Keys** | **Pass** | `SERIAL` PKs, `INT` FKs, `VARCHAR` lengths, `NUMERIC(10,2)` currency fields, `DATE` and `TIME` types, `UNIQUE` keys, and partial unique indexes (`idx_active_bed_admission`, `idx_active_patient_admission`) match across `Design`, `ERDiagram`, and `Schema`. |
-| **Constraint Test Comments** | **Minor Note** | In `ConstraintTests.sql`, Test 12 expects `invoice_status_check`, whereas PostgreSQL evaluated `chk_invoice_settlement` first (which you already explained accurately in `README.md`). Optionally update the `-- Expected error:` comment above Test 12 in `ConstraintTests.sql` to `chk_invoice_settlement` so the file comment matches the exact terminal output. |
-| **Row Counts & Screenshots** | **Pass** | The 9 row counts in `README.md` (`admission: 2`, `bed: 3`, `consultation: 2`, `doctor: 2`, `invoice: 2`, `medication: 3`, `patient: 3`, `prescription: 2`, `prescription_item: 3`) match `SampleData.sql` and all 13 `ConstraintTests.sql` errors are accounted for. |
+Valid fictional records were loaded inside a single `BEGIN`/`COMMIT` transaction in `Id-Victor_Oduduabasi_301932603_P1_SampleData.sql`, looking up generated parent IDs via unique values. The negative tests in `Id-Victor_Oduduabasi_301932603_P1_ConstraintTests.sql` were executed individually in `psql` outside a transaction block so that each rejected `INSERT` could be observed without aborting subsequent tests, followed by a `UNION ALL` row-count query across all nine tables.
 
----
+## Test results
 
-## 3. Exact Comment Updates for `Id-Victor_Oduduabasi_301932603_P1_Schema.sql`
-If you want your SQL comments in `Schema.sql` to align 1-to-1 with the 8 rules in `README.md`, update only the rule numbers in those comments (no table changes needed):
+All valid sample records were accepted into the nine tables, covering active and discharged ward admissions, dispensed and pending prescriptions, and paid and unpaid invoices. All 13 deliberately invalid `INSERT` statements in `Id-Victor_Oduduabasi_301932603_P1_ConstraintTests.sql` were rejected with the expected PostgreSQL errors: `NOT NULL` violation on `patient.full_name`; duplicate `UNIQUE` violations on `doctor.staff_number` (`DOC-101`) and `bed.bed_number` (`GEN-01`); `CHECK` failure on negative `medication.stock_qty` (`-5`); foreign key failure for non-existent `patient_id` (`999999`) in `admission`; partial unique index violations on `idx_active_bed_admission` and `idx_active_patient_admission`; `chk_admission_dates` failure when `discharge_date` preceded `admit_date`; composite slot conflicts on `uq_doctor_slot` and `uq_patient_slot`; `prescription_item_quantity_check` failure for zero quantity; and `chk_invoice_settlement` failures for an invalid `'Partial'` status and an underpaid `'Paid'` invoice.
 
-* `public.bed`: change `(Rule 3)` $\rightarrow$ `(Rule 2)`
-* `public.admission` & partial indexes: change `(Rules 3 & 4)` $\rightarrow$ `(Rules 2 & 3)`
-* `public.consultation`: change `(Rule 5)` $\rightarrow$ `(Rule 4)`
-* `public.prescription`: change `(Rules 6 & 7)` $\rightarrow$ `(Rules 5 & 6)`
-* `public.prescription_item`: change `(Rule 6)` $\rightarrow$ `(Rule 5)`
-* `public.invoice`: change `(Rules 8 & 9)` $\rightarrow$ `(Rules 7 & 8)`
-* Bottom note: change `(Rule 7)` $\rightarrow$ `(Rule 6)` and `(Rule 6)` $\rightarrow$ `(Rule 5)`
+After all invalid statements failed, the final row counts matched the exact expected baseline across every table: `admission` (2), `bed` (3), `consultation` (2), `doctor` (2), `invoice` (2), `medication` (3), `patient` (3), `prescription` (2), and `prescription_item` (3).
+
+Table definitions alone do not enforce cross-table stock checks, one-time dispensing state transitions (Rule 6), or requiring at least one item per prescription (Rule 5); those operational checks remain untested at the DDL level because they require application transactions or database triggers.
