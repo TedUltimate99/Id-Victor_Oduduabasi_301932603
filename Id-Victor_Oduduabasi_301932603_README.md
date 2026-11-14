@@ -10,10 +10,10 @@ A Hospital Management System that tracks patients, doctors, outpatient consultat
 
 ## Portfolio folders
 
-- portfolio-1-database-design: design, schema and normalisation.
-- portfolio-2-query-optimisation: queries, plans and performance analysis.
-- portfolio-3-transactions-concurrency: commit, rollback and concurrency.
-- portfolio-4-nosql: NoSQL model, implementation and suitability.
-- portfolio-5-distributed-cloud: distributed or cloud database exercise.
+- Portfolio-1-Database-design: design, schema and normalisation.
+- Portfolio-2-Query-optimisation: queries, plans and performance analysis.
+- Portfolio-3-Transactions-concurrency: commit, rollback and concurrency.
+- Portfolio-4-Nosql: NoSQL model, implementation and suitability.
+- Portfolio-5-Distributed-cloud: distributed or cloud database exercise.
 
 Each folder will contain its scripts, notes and execution evidence.
