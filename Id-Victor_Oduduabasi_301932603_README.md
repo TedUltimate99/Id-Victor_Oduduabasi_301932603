@@ -6,7 +6,7 @@ Student ID: 301932603
 
 ## Case study
 
-To be selected in the next step.
+A Hospital Management System that tracks patients, doctors, outpatient consultations, inpatient ward beds, pharmacy prescriptions, and patient billing across a single hospital facility.
 
 ## Portfolio folders
 
